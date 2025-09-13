@@ -26,6 +26,7 @@ pub use crate::app::*;
 pub use crate::callback::*;
 pub use crate::error::*;
 pub use crate::friends::*;
+pub use crate::game_coordinator::*;
 pub use crate::input::*;
 pub use crate::matchmaking::*;
 pub use crate::matchmaking_servers::*;
@@ -44,6 +45,7 @@ mod callback;
 mod app;
 mod error;
 mod friends;
+mod game_coordinator;
 mod input;
 mod matchmaking;
 mod matchmaking_servers;
@@ -347,6 +349,22 @@ impl Client {
             debug_assert!(!utils.is_null());
             Utils {
                 utils: utils,
+                _inner: self.inner.clone(),
+            }
+        }
+    }
+
+    /// Returns an accessor to the steam game coordinator interface
+    pub fn game_coordinator(&self) -> GameCoordinator {
+        unsafe {
+            // There's no flat version exported by the SDK; use the GameServer accessor if available
+            let gc = sys::SteamInternal_FindOrCreateUserInterface(
+                sys::SteamAPI_GetHSteamUser(),
+                sys::STEAMGAMECOORDINATOR_INTERFACE_VERSION.as_ptr() as *const _ as *const _,
+            );
+            debug_assert!(!gc.is_null());
+            GameCoordinator {
+                gc: gc as *mut sys::ISteamGameCoordinator,
                 _inner: self.inner.clone(),
             }
         }

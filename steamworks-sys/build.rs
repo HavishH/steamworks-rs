@@ -58,6 +58,44 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("cargo:rustc-link-search={}", out_path.display());
     println!("cargo:rustc-link-lib=dylib={}", lib);
 
+    // This is to avoid modifying the Steamworks SDK files directly.
+
+    // Compile a small C++ wrapper that exposes ISteamGameCoordinator methods as C functions
+    // This is required at link time because bindgen produces extern declarations for
+    // SteamGC_* functions. We compile this wrapper unconditionally so examples and
+    // downstream crates can link even when the `rebuild-bindings` feature is not set.
+    // Expect checked-in wrapper sources to exist. This avoids mutating the repo at
+    // build time and makes the project more explicit about source files.
+    let wrapper_cpp = Path::new("lib").join("steam_gc_wrapper.cpp");
+    let wrapper_h = Path::new("lib").join("steam_gc_wrapper.h");
+    if !wrapper_cpp.exists() {
+        return Err(format!(
+            "Missing required file: {}. Please ensure lib/steam_gc_wrapper.cpp is present.",
+            wrapper_cpp.display()
+        )
+        .into());
+    }
+    if !wrapper_h.exists() {
+        return Err(format!(
+            "Missing required file: {}. Please ensure lib/steam_gc_wrapper.h is present.",
+            wrapper_h.display()
+        )
+        .into());
+    }
+
+    // compile the wrapper into OUT_DIR so the linker can find it for tests and examples
+    cc::Build::new()
+        .cpp(true)
+        .file(&wrapper_cpp)
+        .include(sdk_loc.join("public"))
+        .compile("steam_gc_wrapper");
+
+    // Ensure the compiled wrapper library is linked into downstream crates. The `cc`
+    // crate will produce a static library named libsteam_gc_wrapper.a on unix-like
+    // systems and steam_gc_wrapper.lib on MSVC. Emit the appropriate cargo directive
+    // so the final link step pulls it in.
+    println!("cargo:rustc-link-lib=static=steam_gc_wrapper");
+
     #[cfg(feature = "rebuild-bindings")]
     {
         let target_os = if triple.contains("windows") {
@@ -69,6 +107,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         } else {
             panic!("Unsupported OS");
         };
+
         let binding_path = Path::new(&format!("src/{}_bindings.rs", target_os)).to_owned();
         let bindings = bindgen::Builder::default()
             .header(
@@ -76,6 +115,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     .join("public/steam/steam_api_flat.h")
                     .to_string_lossy(),
             )
+            // ensure wrapper header is parsed so the C functions are generated
+            .header(wrapper_h.to_string_lossy())
             .header(
                 sdk_loc
                     .join("public/steam/steam_gameserver.h")
