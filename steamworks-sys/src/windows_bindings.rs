@@ -280,6 +280,7 @@ pub const STEAMNETWORKINGSOCKETS_INTERFACE_VERSION: &[u8; 26] = b"SteamNetworkin
 pub const STEAMNETWORKINGUTILS_INTERFACE_VERSION: &[u8; 24] = b"SteamNetworkingUtils004\0";
 pub const STEAMGAMESERVER_INTERFACE_VERSION: &[u8; 19] = b"SteamGameServer015\0";
 pub const STEAMGAMESERVERSTATS_INTERFACE_VERSION: &[u8; 24] = b"SteamGameServerStats001\0";
+pub const STEAMGAMECOORDINATOR_INTERFACE_VERSION: &[u8; 24] = b"SteamGameCoordinator001\0";
 pub type uint8 = ::std::os::raw::c_uchar;
 pub type int8 = ::std::os::raw::c_schar;
 pub type int16 = ::std::os::raw::c_short;
@@ -28042,6 +28043,123 @@ extern "C" {
         nPort: uint16,
         popid: SteamNetworkingPOPID,
     );
+}
+#[repr(i32)]
+#[non_exhaustive]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum EGCResults {
+    k_EGCResultOK = 0,
+    k_EGCResultNoMessage = 1,
+    k_EGCResultBufferTooSmall = 2,
+    k_EGCResultNotLoggedOn = 3,
+    k_EGCResultInvalidMessage = 4,
+}
+#[repr(C)]
+pub struct ISteamGameCoordinator__bindgen_vtable(::std::os::raw::c_void);
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ISteamGameCoordinator {
+    pub vtable_: *const ISteamGameCoordinator__bindgen_vtable,
+}
+#[test]
+fn bindgen_test_layout_ISteamGameCoordinator() {
+    assert_eq!(
+        ::std::mem::size_of::<ISteamGameCoordinator>(),
+        8usize,
+        concat!("Size of: ", stringify!(ISteamGameCoordinator))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<ISteamGameCoordinator>(),
+        8usize,
+        concat!("Alignment of ", stringify!(ISteamGameCoordinator))
+    );
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GCMessageAvailable_t {
+    pub m_nMessageSize: uint32,
+}
+pub const GCMessageAvailable_t_k_iCallback: GCMessageAvailable_t__bindgen_ty_1 =
+    GCMessageAvailable_t__bindgen_ty_1::k_iCallback;
+#[repr(i32)]
+#[non_exhaustive]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum GCMessageAvailable_t__bindgen_ty_1 {
+    k_iCallback = 1701,
+}
+#[test]
+fn bindgen_test_layout_GCMessageAvailable_t() {
+    const UNINIT: ::std::mem::MaybeUninit<GCMessageAvailable_t> = ::std::mem::MaybeUninit::uninit();
+    let ptr = UNINIT.as_ptr();
+    assert_eq!(
+        ::std::mem::size_of::<GCMessageAvailable_t>(),
+        4usize,
+        concat!("Size of: ", stringify!(GCMessageAvailable_t))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<GCMessageAvailable_t>(),
+        4usize,
+        concat!("Alignment of ", stringify!(GCMessageAvailable_t))
+    );
+    assert_eq!(
+        unsafe { ::std::ptr::addr_of!((*ptr).m_nMessageSize) as usize - ptr as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(GCMessageAvailable_t),
+            "::",
+            stringify!(m_nMessageSize)
+        )
+    );
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GCMessageFailed_t {
+    pub _address: u8,
+}
+pub const GCMessageFailed_t_k_iCallback: GCMessageFailed_t__bindgen_ty_1 =
+    GCMessageFailed_t__bindgen_ty_1::k_iCallback;
+#[repr(i32)]
+#[non_exhaustive]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum GCMessageFailed_t__bindgen_ty_1 {
+    k_iCallback = 1702,
+}
+#[test]
+fn bindgen_test_layout_GCMessageFailed_t() {
+    assert_eq!(
+        ::std::mem::size_of::<GCMessageFailed_t>(),
+        1usize,
+        concat!("Size of: ", stringify!(GCMessageFailed_t))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<GCMessageFailed_t>(),
+        1usize,
+        concat!("Alignment of ", stringify!(GCMessageFailed_t))
+    );
+}
+extern "C" {
+    pub fn SteamGC_SendMessage(
+        gc: *mut ISteamGameCoordinator,
+        unMsgType: uint32,
+        pubData: *const ::std::os::raw::c_void,
+        cubData: uint32,
+    ) -> uint32;
+}
+extern "C" {
+    pub fn SteamGC_IsMessageAvailable(
+        gc: *mut ISteamGameCoordinator,
+        pcubMsgSize: *mut uint32,
+    ) -> bool;
+}
+extern "C" {
+    pub fn SteamGC_RetrieveMessage(
+        gc: *mut ISteamGameCoordinator,
+        punMsgType: *mut uint32,
+        pubDest: *mut ::std::os::raw::c_void,
+        cubDest: uint32,
+        pcubMsgSize: *mut uint32,
+    ) -> uint32;
 }
 #[repr(i32)]
 #[non_exhaustive]
