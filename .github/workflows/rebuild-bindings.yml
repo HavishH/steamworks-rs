@@ -1,6 +1,9 @@
 name: Rebuild bindings
 
-on: 
+permissions:
+  contents: write
+
+on:
   workflow_dispatch:
   push:
     paths:
@@ -83,7 +86,7 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add steamworks-sys/src/*_bindings.rs
           git commit -m "Update bindings" || echo "No changes to commit"
-      
+
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
