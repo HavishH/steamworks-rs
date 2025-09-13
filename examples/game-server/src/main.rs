@@ -78,7 +78,7 @@ fn main() {
         });
 
         let size = networking.is_p2p_packet_available_on_channel(0);
-        if (size.is_some()) {
+        if size.is_some() {
             let (sender, size) = networking
                 .read_p2p_packet_from_channel(&mut buffer, 2)
                 .expect("Could not read P2P packet");
@@ -89,7 +89,7 @@ fn main() {
         }
 
         let difference = Duration::from_secs_f32(1f32 / 60f32).checked_sub(start.elapsed());
-        if (difference != None) {
+        if difference != None {
             sleep(difference.unwrap());
         } else {
             println!("Event loop lagging!")
