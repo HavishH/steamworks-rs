@@ -81,6 +81,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     .join("public/steam/steam_gameserver.h")
                     .to_string_lossy(),
             )
+            .header(
+                sdk_loc
+                    .join("public/steam/isteamgamecoordinator.h")
+                    .to_string_lossy(),
+            )
             .clang_arg("-xc++")
             .clang_arg("-std=c++11")
             .clang_arg(format!("-I{}", sdk_loc.join("public").display()))
