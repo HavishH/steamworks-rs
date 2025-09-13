@@ -1,4 +1,14 @@
+# Notice
+
+This is a fork of the original `steamworks` / `steamworks-sys` crates.
+I added a small C++ shim (see `steamworks-sys/lib/steam_gc_wrapper.{cpp,h}`)
+so the ISteamGameCoordinator methods are available as simple C functions.
+
+Big thanks to the original authors and maintainers for creating the upstream
+crate.
+
 # steamworks
+
 [![crates.io](https://img.shields.io/crates/v/steamworks.svg)](https://crates.io/crates/steamworks)
 [![Documentation](https://docs.rs/steamworks/badge.svg)](https://docs.rs/steamworks)
 ![License](https://img.shields.io/crates/l/steamworks.svg)
@@ -6,6 +16,7 @@
 This crate provides Rust bindings to the [Steamworks SDK](https://partner.steamgames.com/doc/sdk).
 
 ## Usage
+
 Add the following to your `Cargo.toml`:
 
 ```toml
@@ -22,7 +33,9 @@ steamworks = "0.12.0"
 | 0.9.0  | 1.53a | 1.56.1 |
 
 ## Example
+
 You can find more examples in [examples](examples/).
+
 ```rust
 use steamworks::AppId;
 use steamworks::Client;
@@ -68,12 +81,15 @@ fn main() {
 ```
 
 ## Features
+
 `serde`: This feature enables serialization and deserialization of some types with `serde`.
 `image`: This feature allows accessing image data like icons with `image` crate.
 
 ## License
+
 This crate is dual-licensed under [Apache](./LICENSE-APACHE) and
 [MIT](./LICENSE-MIT), except for the files in [`steamworks-sys/lib/steam/`]
 
 ## Help, I can't run my game!
+
 If you are seeing errors like `STATUS_DLL_NOT_FOUND`, `Image not found` etc. You are likely missing the Steamworks SDK Redistributable files. Steamworks-rs loads the SDK dynamically, so the libraries need to exist somewhere the operating system can find them. This is likely next to your game binary (.exe on windows). You can find the required files in the SDK release ZIP, under `lib\steam\redistributable_bin`. See #63 for further details
